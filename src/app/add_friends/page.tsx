@@ -9,7 +9,6 @@ interface User {
   avatar: string;
   id: string;
   username: string;
-  profile_picture: string | null;
 }
 
 const FindFriendsPage = () => {
@@ -31,21 +30,21 @@ const FindFriendsPage = () => {
         .from('users')
         .select('id, username , avatar');
 
-      if (error) {
-        console.error('Error fetching users:', error.message);
-        setError('Error fetching users.');
-      } else {
-    
-        const filteredUsers = data?.filter((user: User) => user.id !== loggedInUserId);
-        setUsers(filteredUsers || []); 
-      }
-
-      setLoading(false);
-    };
-
-    fetchUsers();
-  }, []);
-
+        if (error) {
+          console.error('Error fetching users:', error.message);
+          setError('Error fetching users.');
+        } else if (data) {
+          const filteredUsers = data.filter((user: User) => user.id !== loggedInUserId);
+          setUsers(filteredUsers);
+        } else {
+          setUsers([]);
+        }
+  
+        setLoading(false);
+      };
+  
+      fetchUsers();
+    }, []);
   const handleUserClick = (userId: string) => {
     
     router.push(`/user/${userId}`); 

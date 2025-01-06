@@ -197,6 +197,7 @@ const handleDeletePost = async (postId: string) => {
       return;
     }
 
+    const deletedPost = "";
     // Step 1: Delete comments related to the post
     console.log('Deleting comments for post ID:', postId);
 

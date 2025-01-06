@@ -14,7 +14,8 @@ interface Post {
 }
 interface User{
 
-username: String
+id: string;
+username: string;
 
 }
 
