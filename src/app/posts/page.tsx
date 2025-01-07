@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import Navbar from '../../components/Navbar';
-
 interface Post {
   id: string;
   title: string;
@@ -197,7 +196,7 @@ const handleDeletePost = async (postId: string) => {
       return;
     }
 
-    const deletedPost = "";
+  
     // Step 1: Delete comments related to the post
     console.log('Deleting comments for post ID:', postId);
 
@@ -233,7 +232,7 @@ const handleDeletePost = async (postId: string) => {
 
       setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
       setComments((prevComments) => {
-        const { [postId]: deletedPost, ...remainingComments } = prevComments;
+        const {...remainingComments } = prevComments;
         return remainingComments;
       });
     }
@@ -305,7 +304,6 @@ const handleDeletePost = async (postId: string) => {
                       <p className="font-semibold text-gray-800">{comment.username}</p>
                       <p className="text-gray-700">{comment.content}</p>
                       <p className="text-sm text-gray-400">
-                        {new Date(comment.created_at).toLocaleString()}
                       </p>
                     </div>
                   ))

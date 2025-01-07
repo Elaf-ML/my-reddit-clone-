@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import Navbar from '../../components/Navbar';
 import { useRouter } from 'next/navigation'; // Import useRouter to handle navigation
-
 interface User {
   avatar: string;
   id: string;

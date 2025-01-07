@@ -30,7 +30,7 @@ const CreatePost = () => {
     // Handle image upload to Supabase Storage
     if (image) {
       const fileName = `${session.user.id}/${Date.now()}_${image.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const {error: uploadError } = await supabase.storage
         .from('image_url') // Ensure you are using the correct bucket name "image_url"
         .upload(fileName, image);
 

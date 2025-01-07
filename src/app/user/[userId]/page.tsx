@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; // Import useParams
 import { supabase } from '../../../utils/supabaseClient'; // Adjust the import according to your project structure
 import Navbar from '../../../components/Navbar'; // Adjust the import according to your project structure
-
+import Image from 'next/image';
 interface Post {
   id: string;
   title: string;
@@ -90,9 +90,9 @@ const UserPostsPage = () => {
       ) : (
         <div className="space-y-6">
           {users.map((user)=>(
-           <div className="flex flex-col items-center justify-center  mt-20 ">
+           <div key={user.id} className="flex flex-col items-center justify-center  mt-20 ">
            <h1 className="text-4xl font-bold text-gray-800 md:text-5xl lg:text-6xl">
-             This is {user.username}'s profile
+             This is {user.username}s profile
            </h1>
          </div>
          
@@ -105,7 +105,7 @@ const UserPostsPage = () => {
    >
      {post.image_url && (
        <div className="overflow-hidden rounded-t-lg">
-         <img
+         <Image
            src={post.image_url}
            alt="Post Image"
            className="w-full h-auto object-contain"

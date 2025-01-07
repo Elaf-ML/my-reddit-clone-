@@ -1,21 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '../../utils/supabaseClient';
 import Navbar from '../../components/Navbar';
 export default function ProfilePage() {
-  const [userData, setUserData] = useState<any>(null); // Store user data
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+
 
   useEffect(() => {
-    // Fetch user details when the component is mounted
-    const fetchUserData = async () => {
+     const fetchUserData = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser(); // Use getUser() method
+        const { data: { user } } = await supabase.auth.getUser(); // Use getUser() method
 
         if (user) {
           // Query the 'users' table using the user.id
@@ -29,7 +26,7 @@ export default function ProfilePage() {
             setError('Failed to fetch user data');
             console.error(error);
           } else {
-            setUserData(data);
+           
             setUsername(data.username); // Initialize the username field
           }
         } else {
@@ -46,31 +43,6 @@ export default function ProfilePage() {
     fetchUserData();
   }, []);
 
-  // Handle username update
-  const handleUpdate = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser(); // Use getUser() method
-      if (user) {
-        const { error } = await supabase
-          .from('users')
-          .update({ username })
-          .eq('id', user.id);
-
-        if (error) {
-          setError('Error updating username');
-          console.error(error);
-        } else {
-          alert('Username updated successfully!');
-        }
-      }
-    } catch (err) {
-      setError('Error updating username');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return <div>Loading...</div>;
