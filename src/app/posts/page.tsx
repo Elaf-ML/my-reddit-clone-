@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import Navbar from '../../components/Navbar';
+
 interface Post {
   id: string;
   title: string;
@@ -86,11 +87,7 @@ const PostsPage = () => {
       }
 
       const userIdToUsername = usersData.reduce((acc, user) => {
-        if (!acc[user.id]) {
-          acc[user.id] = user.username; // Use the first match for each user_id
-        } else {
-          console.warn(`Duplicate user found for user_id: ${user.id}. Ignoring additional entries.`);
-        }
+        acc[user.id] = user.username;
         return acc;
       }, {} as Record<string, string>);
 
@@ -101,7 +98,7 @@ const PostsPage = () => {
         }
         acc[post_id].push({
           ...comment,
-          username: userIdToUsername[comment.user_id] || 'Unknown', // Attach username
+          username: userIdToUsername[comment.user_id] || 'Unknown',
         });
         return acc;
       }, {} as Record<string, Comment[]>);
@@ -158,9 +155,6 @@ const PostsPage = () => {
       if (userError || !userData || userData.length === 0) {
         console.warn(`No user found for user_id: ${newComment.user_id}`);
         newComment.username = 'Unknown';
-      } else if (userData.length > 1) {
-        console.warn(`Multiple users found for user_id: ${newComment.user_id}. Using the first match.`);
-        newComment.username = userData[0].username;
       } else {
         newComment.username = userData[0].username;
       }
@@ -174,81 +168,71 @@ const PostsPage = () => {
 
     setLoading(false);
   };
-//------------------------------
 
-  
-const handleDeletePost = async (postId: string) => {
-  if (!confirm('Are you sure you want to delete this post and its comments?')) {
-    return;
-  }
-
-  setLoading(true);
-  setError('');
-
-  try {
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-
-    if (sessionError || !session?.user) {
-      setError('You must be logged in to delete a post.');
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm('Are you sure you want to delete this post and its comments?')) {
       return;
     }
 
-  
-    // Step 1: Delete comments related to the post
-    console.log('Deleting comments for post ID:', postId);
+    setLoading(true);
+    setError('');
 
-    const { error: commentsError } = await supabase
-      .from('Comments')
-      .delete()
-      .eq('post_id', postId);
+    try {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-    if (commentsError) {
-      console.error('Error deleting comments:', commentsError.message);
-      setError('Error deleting comments.');
-      setLoading(false);
-      return;
-    }
+      if (sessionError || !session?.user) {
+        setError('You must be logged in to delete a post.');
+        return;
+      }
 
-    console.log('Comments deleted successfully.');
+      // Step 1: Delete comments related to the post
+      const { error: commentsError } = await supabase
+        .from('Comments')
+        .delete()
+        .eq('post_id', postId);
 
-    // Step 2: Delete the post after the comments are removed
-    console.log('Deleting post ID:', postId);
+      if (commentsError) {
+        console.error('Error deleting comments:', commentsError.message);
+        setError('Error deleting comments.');
+        setLoading(false);
+        return;
+      }
 
-    const { error: postError } = await supabase
-      .from('Posts')
-      .delete()
-      .eq('id', postId)
-      .eq('user_id', session.user.id);
+      
+// Step 2: Delete the post after the comments are removed
+const { error: postError } = await supabase
+.from('Posts')
+.delete()
+.eq('id', postId)
+.eq('user_id', session.user.id);
 
-    if (postError) {
-      console.error('Error deleting post:', postError.message);
-      setError('Error deleting post.');
-    } else {
-      // Step 3: Update the UI state to reflect the deletion
-      console.log('Post deleted successfully.');
+if (postError) {
+console.error('Error deleting post:', postError.message);
+setError('Error deleting post.');
+} else {
+// Step 3: Update the UI state to reflect the deletion
+setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+setComments((prevComments) => {
+  const updatedComments = { ...prevComments };
+  delete updatedComments[postId];
+  return updatedComments;
+});
+}
+} catch (error) {
+console.error('Unexpected error during post deletion:', error);
+setError('Unexpected error occurred.');
+}
 
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-      setComments((prevComments) => {
-        const {...remainingComments } = prevComments;
-        return remainingComments;
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error during post deletion:', error);
-    setError('Unexpected error occurred.');
-  }
-
-  setLoading(false);
-};
-
+setLoading(false);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gray-100">
       <Navbar />
-      <h1 className="text-4xl font-semibold text-center mb-8 mt-10">My Posts</h1>
+      <h1 className="text-4xl font-semibold text-black text-center mb-8 mt-20">My Posts</h1>
 
       {loading ? (
         <p className="text-center">Loading posts...</p>
@@ -257,7 +241,7 @@ const handleDeletePost = async (postId: string) => {
       ) : posts.length === 0 ? (
         <p className="text-center text-gray-600">You have not created any posts yet.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full max-w-4xl">
           {posts.map((post) => (
             <div
               key={post.id}
@@ -266,11 +250,15 @@ const handleDeletePost = async (postId: string) => {
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{post.title}</h2>
 
               {post.image_url && (
-                <img
-                  src={post.image_url}
-                  alt={post.title}
-                  className="w-full h-auto mb-4 rounded-md"
-                />
+          <div className="flex justify-center">
+          <img
+            src={post.image_url}
+            alt={post.title}
+            width={500} // Provide the appropriate width
+            height={400} // Provide the appropriate height
+            className="mb-4 rounded-md"
+          />
+        </div>
               )}
 
               <p className="text-gray-600">{post.content}</p>
@@ -282,7 +270,7 @@ const handleDeletePost = async (postId: string) => {
                   placeholder="Add a comment..."
                   value={commentInputs[post.id] || ''}
                   onChange={(e) => handleCommentInputChange(post.id, e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-2 border text-black border-gray-300 rounded-md"
                 />
                 <button
                   onClick={() => handleAddComment(post.id)}
@@ -303,8 +291,7 @@ const handleDeletePost = async (postId: string) => {
                     >
                       <p className="font-semibold text-gray-800">{comment.username}</p>
                       <p className="text-gray-700">{comment.content}</p>
-                      <p className="text-sm text-gray-400">
-                      </p>
+                      <p className="text-sm text-gray-400"></p>
                     </div>
                   ))
                 ) : (

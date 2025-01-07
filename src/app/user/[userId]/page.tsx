@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; // Import useParams
 import { supabase } from '../../../utils/supabaseClient'; // Adjust the import according to your project structure
 import Navbar from '../../../components/Navbar'; // Adjust the import according to your project structure
-import Image from 'next/image';
+
 interface Post {
   id: string;
   title: string;
@@ -78,7 +78,7 @@ const UserPostsPage = () => {
   }, [userId]); // Re-run when userId changes
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gray-100">
       <Navbar />
 
       {loading ? (
@@ -105,7 +105,7 @@ const UserPostsPage = () => {
    >
      {post.image_url && (
        <div className="overflow-hidden rounded-t-lg">
-         <Image
+         <img
            src={post.image_url}
            alt="Post Image"
            className="w-full h-auto object-contain"

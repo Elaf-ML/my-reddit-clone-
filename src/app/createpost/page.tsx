@@ -69,45 +69,45 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gray-100">
     <Navbar />
-      <h1 className="text-4xl font-semibold text-center mb-8 mt-10">Create a Post</h1>
+      <h1 className="text-4xl font-semibold text-center text-black mb-8 mt-10">Create a Post</h1>
 
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       <form onSubmit={handleCreatePost} className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-lg font-medium">Title</label>
+          <label htmlFor="title" className="block text-lg text-black font-medium">Title</label>
           <input
             type="text"
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border text-black border-gray-300 rounded-md"
             required
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-lg font-medium">Content</label>
+          <label htmlFor="content" className="block text-black text-lg font-medium">Content</label>
           <textarea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border text-black border-gray-300 rounded-md"
             rows={6}
             required
           />
         </div>
 
         <div>
-          <label htmlFor="image" className="block text-lg font-medium">Image</label>
+          <label htmlFor="image" className="block text-lg text-black font-medium">Image</label>
           <input
             type="file"
             id="image"
             accept="image/*"
             onChange={(e) => setImage(e.target.files?.[0] || null)}
-            className="w-full p-3 border border-gray-300 rounded-md"
+            className="w-full p-3 border text-black border-gray-300 rounded-md"
           />
         </div>
 

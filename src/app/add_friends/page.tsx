@@ -50,9 +50,9 @@ const FindFriendsPage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
+    <div className="min-h-screen  flex flex-col mt-10 p-4 bg-gray-100">
       <Navbar />
-      <h1 className="text-4xl font-semibold text-center mb-8 mt-10">Find Friends</h1>
+      <h1 className="text-4xl font-semibold text-center text-black mb-8 mt-10">Find Friends</h1>
 
       {loading ? (
         <p className="text-center">Loading users...</p>

@@ -49,10 +49,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="min-h-screen w-screen flex flex-col items-center justify-center p-4 bg-gray-100">
       <Navbar />
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded">
-        <h2 className="text-2xl font-bold mb-6 text-center">Profile</h2>
+        <h2 className="text-2xl font-bold text-black mb-6 text-center">Profile</h2>
 
         {/* Display the current username */}
         <div className="mb-4">
@@ -61,7 +61,7 @@ export default function ProfilePage() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full text-black px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             disabled
           />
         </div>
