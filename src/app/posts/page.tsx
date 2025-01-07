@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
@@ -19,7 +19,7 @@ interface Comment {
   user_id: string;
   content: string;
   created_at: string;
-  username: string; // Updated to include username
+  username: string;
 }
 
 const PostsPage = () => {
@@ -28,6 +28,7 @@ const PostsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -44,7 +45,7 @@ const PostsPage = () => {
         setLoading(false);
         return;
       }
-
+      setSession(session);
       const { data, error } = await supabase
         .from('Posts')
         .select('*')
@@ -169,64 +170,84 @@ const PostsPage = () => {
     setLoading(false);
   };
 
-  const handleDeletePost = async (postId: string) => {
-    if (!confirm('Are you sure you want to delete this post and its comments?')) {
+  const handleDeleteComment = async (commentId: string, postId: string) => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+      setError('You must be logged in to delete a comment.');
       return;
     }
 
     setLoading(true);
     setError('');
 
-    try {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
+    const { data: commentData, error: commentError } = await supabase
+      .from('Comments')
+      .select('user_id')
+      .eq('id', commentId)
+      .single();
 
-      if (sessionError || !session?.user) {
-        setError('You must be logged in to delete a post.');
-        return;
-      }
+    if (commentError || !commentData) {
+      console.error('Error fetching comment:', commentError?.message);
+      setError('Error fetching comment.');
+      setLoading(false);
+      return;
+    }
 
-      // Step 1: Delete comments related to the post
-      const { error: commentsError } = await supabase
-        .from('Comments')
-        .delete()
-        .eq('post_id', postId);
+    if (commentData.user_id !== session.user.id) {
+      setError('You can only delete your own comments.');
+      setLoading(false);
+      return;
+    }
 
-      if (commentsError) {
-        console.error('Error deleting comments:', commentsError.message);
-        setError('Error deleting comments.');
-        setLoading(false);
-        return;
-      }
+    const { error: deleteError } = await supabase
+      .from('Comments')
+      .delete()
+      .eq('id', commentId);
 
-      
-// Step 2: Delete the post after the comments are removed
-const { error: postError } = await supabase
-.from('Posts')
-.delete()
-.eq('id', postId)
-.eq('user_id', session.user.id);
+    if (deleteError) {
+      console.error('Error deleting comment:', deleteError.message);
+      setError('Error deleting comment.');
+    } else {
+      setComments((prev) => ({
+        ...prev,
+        [postId]: prev[postId].filter((comment) => comment.id !== commentId),
+      }));
+    }
 
-if (postError) {
-console.error('Error deleting post:', postError.message);
-setError('Error deleting post.');
-} else {
-// Step 3: Update the UI state to reflect the deletion
-setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-setComments((prevComments) => {
-  const updatedComments = { ...prevComments };
-  delete updatedComments[postId];
-  return updatedComments;
-});
-}
-} catch (error) {
-console.error('Unexpected error during post deletion:', error);
-setError('Unexpected error occurred.');
-}
+    setLoading(false);
+  };
 
-setLoading(false);
+  const handleDeletePost = async (postId: string) => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+      setError('You must be logged in to delete a post.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    const { error: deleteError } = await supabase
+      .from('Posts')
+      .delete()
+      .eq('id', postId);
+
+    if (deleteError) {
+      console.error('Error deleting post:', deleteError.message);
+      setError('Error deleting post.');
+    } else {
+      setPosts((prev) => prev.filter((post) => post.id !== postId));
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -250,15 +271,15 @@ setLoading(false);
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{post.title}</h2>
 
               {post.image_url && (
-          <div className="flex justify-center">
-          <img
-            src={post.image_url}
-            alt={post.title}
-            width={500} // Provide the appropriate width
-            height={400} // Provide the appropriate height
-            className="mb-4 rounded-md"
-          />
-        </div>
+                <div className="flex justify-center">
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    width={500}
+                    height={400}
+                    className="mb-4 rounded-md"
+                  />
+                </div>
               )}
 
               <p className="text-gray-600">{post.content}</p>
@@ -291,7 +312,17 @@ setLoading(false);
                     >
                       <p className="font-semibold text-gray-800">{comment.username}</p>
                       <p className="text-gray-700">{comment.content}</p>
-                      <p className="text-sm text-gray-400"></p>
+                      <p className="text-sm text-gray-400">
+                        {new Date(comment.created_at).toLocaleDateString()}
+                      </p>
+                      {comment.user_id === session?.user.id && (
+                        <button
+                          onClick={() => handleDeleteComment(comment.id, post.id)}
+                          className="mt-2 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                        >
+                          Delete Comment
+                        </button>
+                      )}
                     </div>
                   ))
                 ) : (
