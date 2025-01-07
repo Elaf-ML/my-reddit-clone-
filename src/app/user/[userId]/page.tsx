@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../utils/supabaseClient';
 import Navbar from '../../../components/Navbar';
+import { Session } from '@supabase/supabase-js';
 
 interface Post {
   id: string;
@@ -33,8 +34,8 @@ const PostsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
-  const [session, setSession] = useState<any>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
+  const [users] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -244,7 +245,7 @@ const PostsPage = () => {
           {users.map((user) => (
             <div key={user.id} className="flex flex-col items-center justify-center mt-20">
               <h1 className="text-4xl text-black font-bold text-gray-800 md:text-5xl lg:text-6xl">
-                This is {user.username}'s profile
+                This is {user.username}s profile
               </h1>
             </div>
           ))}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import Navbar from '../../components/Navbar';
+import { Session } from '@supabase/supabase-js';
 
 interface Post {
   id: string;
@@ -28,7 +29,8 @@ const PostsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
-  const [session, setSession] = useState<any>(null);
+  
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
