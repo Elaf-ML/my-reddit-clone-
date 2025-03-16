@@ -1,74 +1,40 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "../utils/supabaseClient";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../utils/supabaseClient';
+import Cookies from 'js-cookie';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export default function HomePage() {
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
-      router.push("/posts");
-    }
-  };
+  useEffect(() => {
+    const redirectUser = async () => {
+      try {
+        // Check if user is logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // If user has an active session, redirect to posts
+          router.push('/posts');
+        } else {
+          // If no session, redirect to login
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        // If any error occurs, redirect to login as fallback
+        router.push('/login');
+      }
+    };
 
+    redirectUser();
+  }, [router]);
+
+  // Return a loading state while redirecting
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-2xl font-semibold text-gray-700 text-center">Login</h1>
-        <form onSubmit={handleLogin} className="mt-4 space-y-4">
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-200"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="w-full mt-1 px-4 py-2 border rounded-md focus:ring focus:ring-blue-200"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300"
-          >
-            Login
-          </button>
-        </form>
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => router.push("/register")}
-            className="text-blue-500 hover:underline"
-          >
-            Create Account
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-12 h-12 border-4 border-gray-200 border-t-orange-500 rounded-full animate-spin"></div>
     </div>
   );
 }

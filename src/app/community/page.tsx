@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
@@ -33,7 +33,7 @@ interface Comment {
   username: string;
 }
 
-const MyPostsPage = () => {
+const CommunityPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [loading, setLoading] = useState(true);
@@ -64,22 +64,21 @@ const MyPostsPage = () => {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.user) {
-        setError('You must be logged in to view your posts.');
+        setError('You must be logged in to view community posts.');
         setLoading(false);
         return;
       }
       setSession(session);
       
-      // Get only the current user's posts
+      // Get ALL posts, no user_id filter
       const { data: postsData, error: postsError } = await supabase
         .from('Posts')
         .select('*')
-        .eq('user_id', session.user.id) // Filter for current user's posts only
         .order('created_at', { ascending: false });
 
       if (postsError) {
         console.error('Error fetching posts:', postsError.message);
-        setError('Error fetching your posts.');
+        setError('Error fetching community posts.');
         setLoading(false);
         return;
       }
@@ -330,7 +329,7 @@ const MyPostsPage = () => {
       <Navbar />
       <div className="max-w-4xl mx-auto pt-20 pb-10 px-4">
         <div className="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <h1 className="text-3xl font-bold text-gray-800">My Posts</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Community Posts</h1>
           <div className="flex gap-4 w-full md:w-auto">
             <button 
               onClick={() => setIsCreatePostModalOpen(true)}
@@ -342,7 +341,7 @@ const MyPostsPage = () => {
             <div className="relative flex-1 md:w-64">
               <input
                 type="text"
-                placeholder="Search my posts..."
+                placeholder="Search community posts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -351,12 +350,13 @@ const MyPostsPage = () => {
           </div>
         </div>
         
+        {/* Add link to view your own posts */}
         <div className="mb-6">
           <Link 
-            href="/community" 
+            href="/posts" 
             className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
           >
-            <span>View all community posts</span>
+            <span>View my posts</span>
             <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
@@ -376,8 +376,8 @@ const MyPostsPage = () => {
             <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
             </svg>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">No posts yet</h2>
-            <p className="text-gray-600 mb-4">Create your first post to get started!</p>
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">No community posts yet</h2>
+            <p className="text-gray-600 mb-4">Be the first to create a post!</p>
             <button 
               onClick={() => setIsCreatePostModalOpen(true)}
               className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-6 rounded-lg shadow transition-colors hover:from-purple-600 hover:to-pink-600"
@@ -517,4 +517,4 @@ const MyPostsPage = () => {
   );
 };
 
-export default MyPostsPage;
+export default CommunityPage; 
