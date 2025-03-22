@@ -1,0 +1,10 @@
+warning: in the working copy of 'src/app/posts/page.tsx', LF will be replaced by CRLF the next time Git touches it
+package-lock.json
+package.json
+src/app/createpost/page.tsx
+src/app/layout.tsx
+src/app/page.tsx
+src/app/posts/page.tsx
+src/components/CreatePostModal.tsx
+src/components/Navbar.tsx
+src/utils/supabaseClient.ts

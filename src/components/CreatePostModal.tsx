@@ -170,7 +170,8 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, onPo
           content,
           user_id: session.user.id,
           image_url: imageUrl,
-          username: userUsername // Save the username we fetched from users table
+          username: userUsername, // Save the username we fetched from users table
+          votes: 0 // Initialize votes to 0
         },
       ]);
 

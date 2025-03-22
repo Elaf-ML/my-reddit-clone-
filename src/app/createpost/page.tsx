@@ -71,6 +71,7 @@ const CreatePost = () => {
           content,
           user_id: session.user.id,
           image_url: imageUrl,
+          votes: 0
         },
       ]);
 
