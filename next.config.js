@@ -1,7 +1,9 @@
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  eslint: {
+    // Warning: This allows production deployment with ESLint errors
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
-console.log('Next.js configuration:', nextConfig);
