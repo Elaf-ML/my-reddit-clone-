@@ -7,3 +7,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+console.log('Next.js configuration:', nextConfig);
