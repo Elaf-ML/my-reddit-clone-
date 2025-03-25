@@ -25,11 +25,7 @@ export async function getAllPosts(): Promise<{ posts: Post[]; error: string | nu
     const { data: postsData, error: postsError } = await supabase
       .from('Posts')
       .select('*')
-      .order('created_at', { ascending: false })
-      .options({
-        count: 'exact',
-        head: false
-      });
+      .order('created_at', { ascending: false });
         
     if (postsError) {
       console.error('Error fetching posts:', postsError.message);
@@ -43,7 +39,7 @@ export async function getAllPosts(): Promise<{ posts: Post[]; error: string | nu
       console.log('No posts found');
       return { posts: [], error: null };
     }
-
+    // we need to get the username for each post
     // Get all user IDs for posts that don't have a username
     const userIds = [...new Set(postsData
       .filter(post => !post.username)

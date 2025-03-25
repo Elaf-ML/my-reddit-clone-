@@ -6,5 +6,5 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
 console.log('Next.js configuration:', nextConfig);

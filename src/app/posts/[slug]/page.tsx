@@ -128,11 +128,12 @@ const SinglePostPage = () => {
     }
     
     if (window.confirm('Are you sure you want to delete this comment?')) {
-      const { success, error } = await deleteComment(commentId);
+      const result = await deleteComment(commentId, user.id);
       
-      if (error) {
-        toast.showToast(`Error deleting comment: ${error}`, 'error');
-      } else if (success) {
+      if (!result.success) {
+        const errorMessage = 'message' in result ? result.message : 'Failed to delete comment';
+        toast.showToast(`Error deleting comment: ${errorMessage}`, 'error');
+      } else {
         // Refresh comments
         if (post) {
           const { comments: updatedComments } = await getPostComments(post.id);
@@ -150,11 +151,12 @@ const SinglePostPage = () => {
     }
     
     if (window.confirm('Are you sure you want to delete this comment?')) {
-      const { success, error } = await deleteCommentAsPostAuthor(commentId, user.id);
+      const result = await deleteCommentAsPostAuthor(commentId, user.id);
       
-      if (error) {
-        toast.showToast(`Error deleting comment: ${error}`, 'error');
-      } else if (success) {
+      if (!result.success) {
+        const errorMessage = 'error' in result ? result.error : 'Failed to delete comment';
+        toast.showToast(`Error deleting comment: ${errorMessage}`, 'error');
+      } else {
         // Refresh comments
         const { comments: updatedComments } = await getPostComments(post.id);
         setComments(updatedComments);
